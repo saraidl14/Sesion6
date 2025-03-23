@@ -1,4 +1,8 @@
-﻿namespace Sesion6
+﻿using Plugin.Fingerprint;
+using Plugin.Fingerprint.Abstractions;
+using System.Threading.Tasks;
+
+namespace Sesion6
 {
     public partial class MainPage : ContentPage
     {
@@ -24,15 +28,40 @@
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex);
+                await DisplayAlert("Localizacion", ex.Message, "Cancelar");
             }
         }
-        private void ClickedGPS(object sender, EventArgs e)
+        private async void ClickedGPS(object sender, EventArgs e)
         {
+            try
+            {
+                var loc = await Geolocation.GetLastKnownLocationAsync(); //FUNCION ASINCRONA Conviene poner await antes
+                if (loc != null)
+                {
+                    await DisplayAlert("Localizacion", "Hey hey hey tengo tu ubicacion:" +loc.Latitude + loc.Longitude + "" , "Cancelar" ); 
+                  
+                }
 
+            }
+            catch (Exception ex)
+            {
+                await DisplayAlert("Localizacion",ex.Message, "Cancelar");
+            }
         }
-        private void ClickedHuellas(object sender, EventArgs e)
+        private async void ClickedHuellas(object sender, EventArgs e)
         {
+            var request = new AuthenticationRequestConfiguration("Autenticacion", "Por favor autentiquese" );
+            var result = await CrossFingerprint.Current.AuthenticateAsync(request);
+            
+            if(result.Authenticated)
+            {
+                await DisplayAlert("Autenticacion", "Autenticacion exitosa", "Aceptar");
+            }
+            else
+            {
+                await DisplayAlert("Fallo en Autenticacion", "Autenticacion fallida", "Aceptar");
+            }
+
 
         }
     }
